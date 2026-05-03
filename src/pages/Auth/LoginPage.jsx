@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 
@@ -56,12 +57,12 @@ const LoginPage = () => {
         <div className="text-center pt-4">
           <p className="text-text-muted">
             Chưa có tài khoản?{" "}
-            <a
-              href="#"
+            <Link
+              to="/register"
               className="text-neon font-bold hover:underline decoration-neon-glow underline-offset-4"
             >
               Đăng ký ngay
-            </a>
+            </Link>
           </p>
         </div>
       </div>

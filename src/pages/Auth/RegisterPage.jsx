@@ -1,62 +1,68 @@
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
-import axios from "../../api/axios";
-import { useState } from "react";
+import { authApi } from "../../api/auth.api";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { toast } from "sonner";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+  const registerSchema = z
+    .object({
+      name: z.string().min(2, "Name must be at least 2 characters"),
+      email: z.string().email("Invalid email address"),
+      password: z.string().min(6, "Password must be at least 6 characters"),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: "Passwords do not match",
+      path: ["confirmPassword"],
+    });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+    mode: "onTouched",
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const onRegister = async (data) => {
     try {
-      const response = await axios.post("/auth/signUp", formData);
-
+      const { name, email, password } = data;
+      const registerData = { name, email, password };
+      const response = await authApi.register(registerData);
       const isSuccess = response.data.success;
-      // Điều hướng sau khi đăng nhập thành công
+
       if (isSuccess) {
+        toast.success("Đăng ký thành công!");
         navigate("/login");
       }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.";
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
+      toast.error(errorMessage);
     }
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      {/* Container chính với hiệu ứng Movie Card */}
-      <div className="movie-card w-full max-w-md p-8 space-y-8">
+      {/* Container chính với theme Đỏ-Đen */}
+      <div className="movie-card w-full max-w-md p-8 space-y-8 bg-background-card border-white/5">
         {/* Header của Form */}
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-neon tracking-tight">
+          <h2 className="text-3xl font-extrabold text-primary tracking-tight">
             TẠO TÀI KHOẢN
           </h2>
           <p className="mt-2 text-text-muted">Vui lòng đăng ký để tiếp tục</p>
         </div>
 
-        {/* --- Hiển thị thông báo lỗi ở đây --- */}
-        {error && (
-          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/50 text-red-500 text-sm text-center">
-            {error}
-          </div>
-        )}
-
         {/* Register Form Content */}
-        <form className="mt-8 space-y-6" onSubmit={handleRegister}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onRegister)}>
           <div className="space-y-4">
             {/* Input Name */}
             <div>
@@ -65,14 +71,16 @@ const RegisterPage = () => {
               </label>
               <Input
                 type="text"
-                required
                 placeholder="Your Name"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                {...register("name")}
               />
+              {errors.name && (
+                <p className="text-primary text-xs mt-1">
+                  {errors.name.message}
+                </p>
+              )}
             </div>
+
             {/* Input Email */}
             <div>
               <label className="block text-sm font-medium text-text-muted mb-1 ml-1">
@@ -80,13 +88,14 @@ const RegisterPage = () => {
               </label>
               <Input
                 type="email"
-                required
                 placeholder="name@example.com"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
+                {...register("email")}
               />
+              {errors.email && (
+                <p className="text-primary text-xs mt-1">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
             {/* Input Password */}
@@ -96,14 +105,16 @@ const RegisterPage = () => {
               </label>
               <Input
                 type="password"
-                required
                 placeholder="••••••••"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
+                {...register("password")}
               />
+              {errors.password && (
+                <p className="text-primary text-xs mt-1">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
+
             {/* Input Confirm Password */}
             <div>
               <label className="block text-sm font-medium text-text-muted mb-1 ml-1">
@@ -111,29 +122,30 @@ const RegisterPage = () => {
               </label>
               <Input
                 type="password"
-                required
                 placeholder="••••••••"
-                value={formData.confirmPassword}
-                onChange={(e) =>
-                  setFormData({ ...formData, confirmPassword: e.target.value })
-                }
+                {...register("confirmPassword")}
               />
+              {errors.confirmPassword && (
+                <p className="text-primary text-xs mt-1">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
             </div>
           </div>
 
           {/* Register Button */}
-          <Button type="submit" disabled={loading}>
-            {loading ? "ĐANG ĐĂNG KÝ..." : "ĐĂNG KÝ"}
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "ĐANG ĐĂNG KÝ..." : "ĐĂNG KÝ"}
           </Button>
         </form>
 
-        {/* Direct to Signup */}
+        {/* Direct to Login */}
         <div className="text-center pt-4">
-          <p className="text-text-muted">
+          <p className="text-text-muted text-sm">
             Đã có tài khoản?{" "}
             <Link
               to="/login"
-              className="text-neon font-bold hover:underline decoration-neon-glow underline-offset-4"
+              className="text-primary font-bold hover:underline underline-offset-4 decoration-primary"
             >
               Đăng nhập ngay
             </Link>

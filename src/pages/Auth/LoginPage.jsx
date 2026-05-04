@@ -1,33 +1,44 @@
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
-import { useState } from "react";
-import axios from "../../api/axios";
+import { authApi } from "../../api/auth.api";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import useAuthStore from "../../hooks/useAuth";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+  const loginSchema = z.object({
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    mode: "onTouched",
+  });
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const onLogin = async (data) => {
     try {
-      const response = await axios.post("/auth/signIn", formData);
+      const response = await authApi.login(data);
+      const isSuccess = response.data.success;
+
+      if (isSuccess) {
+        toast.success("Đăng nhập thành công!");
+      }
 
       const { token, refreshToken, user } = response.data.data;
 
-      // Lưu token vào localStorage
-      localStorage.setItem("token", token);
-      localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("user", JSON.stringify(user));
-      // Điều hướng sau khi đăng nhập thành công
+      login(user, token, refreshToken);
+
       if (user.role === "admin") {
         navigate("/");
       } else {
@@ -37,33 +48,24 @@ const LoginPage = () => {
       const errorMessage =
         error.response?.data?.message ||
         "Đăng nhập thất bại. Vui lòng thử lại.";
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
+      toast.error(errorMessage);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      {/* Container chính với hiệu ứng Movie Card */}
-      <div className="movie-card w-full max-w-md p-8 space-y-8">
+      {/* Container chính với hiệu ứng Movie Card mới */}
+      <div className="movie-card w-full max-w-md p-8 space-y-8 bg-background-card border-white/5">
         {/* Header của Form */}
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-neon tracking-tight">
+          <h2 className="text-3xl font-extrabold text-primary tracking-tight">
             WELCOME BACK
           </h2>
           <p className="mt-2 text-text-muted">Vui lòng đăng nhập để tiếp tục</p>
         </div>
 
-        {/* --- Hiển thị thông báo lỗi ở đây --- */}
-        {error && (
-          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/50 text-red-500 text-sm text-center">
-            {error}
-          </div>
-        )}
-
         {/* Login Form Content */}
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onLogin)}>
           <div className="space-y-4">
             {/* Input Email */}
             <div>
@@ -74,12 +76,15 @@ const LoginPage = () => {
                 type="email"
                 required
                 placeholder="name@example.com"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
+                {...register("email")}
               />
             </div>
+
+            {errors.email && (
+              <p className="text-primary text-xs mt-1">
+                {errors.email.message}
+              </p>
+            )}
 
             {/* Input Password */}
             <div>
@@ -90,41 +95,44 @@ const LoginPage = () => {
                 type="password"
                 required
                 placeholder="••••••••"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
+                {...register("password")}
               />
             </div>
+
+            {errors.password && (
+              <p className="text-primary text-xs mt-1">
+                {errors.password.message}
+              </p>
+            )}
           </div>
 
           {/* Quên mật khẩu & Remember me */}
           <div className="flex items-center justify-between text-xs">
-            <label className="flex items-center text-text-muted cursor-pointer hover:text-neon">
-              <input type="checkbox" className="mr-2 accent-neon" />
+            <label className="flex items-center text-text-muted cursor-pointer hover:text-primary transition-colors">
+              <input type="checkbox" className="mr-2 accent-primary w-4 h-4" />
               Ghi nhớ tôi
             </label>
             <a
               href="#"
-              className="text-neon-dim hover:text-neon transition-colors"
+              className="text-text-muted hover:text-primary transition-colors"
             >
               Quên mật khẩu?
             </a>
           </div>
 
           {/* Login Button */}
-          <Button type="submit" disabled={loading}>
-            {loading ? "ĐANG ĐĂNG NHẬP..." : "ĐĂNG NHẬP"}
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "ĐANG ĐĂNG NHẬP..." : "ĐĂNG NHẬP"}
           </Button>
         </form>
 
         {/* Direct to Signup */}
         <div className="text-center pt-4">
-          <p className="text-text-muted">
+          <p className="text-text-muted text-sm">
             Chưa có tài khoản?{" "}
             <Link
               to="/register"
-              className="text-neon font-bold hover:underline decoration-neon-glow underline-offset-4"
+              className="text-primary font-bold hover:underline underline-offset-4 decoration-primary"
             >
               Đăng ký ngay
             </Link>

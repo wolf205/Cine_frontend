@@ -1,14 +1,16 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Search, User } from "lucide-react";
+import { Search, User, LogOut } from "lucide-react";
 import useAuthStore from "../../hooks/useAuth"; // Đường dẫn đến store của bạn
 import { toast } from "sonner";
+import { authApi } from "../../api/auth.api"; // Đường dẫn đến API của bạn
 
 const Navbar = () => {
   const navigate = useNavigate();
   // Lấy user và hàm logout từ Zustand store
-  const { user, logout } = useAuthStore();
+  const { user, logout, refreshToken } = useAuthStore();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await authApi.logout({ refreshToken });
     logout();
     toast.success("Đăng xuất thành công!");
     navigate("/login");
@@ -90,7 +92,7 @@ const Navbar = () => {
               onClick={handleLogout}
               className="text-xs text-text-muted hover:text-primary transition-colors ml-2"
             >
-              Đăng xuất
+              <LogOut className="w-4 h-4" />
             </button>
           </div>
         ) : (

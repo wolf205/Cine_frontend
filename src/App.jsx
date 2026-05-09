@@ -2,6 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ui/ProtectedRoute";
 import { Toaster } from "sonner";
 
+// Layouts
+import MainLayout from "./components/layout/MainLayout";
+
 // Pages
 import HomePage from "./pages/home/HomePage";
 import MovieListPage from "./pages/movie/MovieListPage";
@@ -23,33 +26,43 @@ function App() {
       <Toaster position="bottom-right" richColors />
       <Router>
         <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/movies" element={<MovieListPage />} />
-          <Route path="/movie/:id" element={<MovieDetailPage />} />
-          <Route path="/cinemas" element={<CinemaListPage />} />
-          <Route path="/cinema/:id" element={<CinemaDetailPage />} />
-          <Route path="/showtimes" element={<ShowtimeListPage />} />
+          {/* ==========================================
+              CÁC TRANG KHÔNG CÓ NAVBAR & FOOTER 
+             ========================================== */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
-          {/* Private Routes */}
-          <Route element={<ProtectedRoute />}>
-            {/* Booking flow */}
-            <Route path="/checkout/:showtimeId" element={<CheckoutPage />} />
-            <Route path="/payment/:bookingId" element={<PaymentPage />} />
-            <Route path="/ticket/:bookingId" element={<TicketPage />} />
+          {/* ==========================================
+              CÁC TRANG CÓ NAVBAR & FOOTER 
+             ========================================== */}
+          <Route element={<MainLayout />}>
+            {/* Public Routes */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/movies" element={<MovieListPage />} />
+            <Route path="/movie/:id" element={<MovieDetailPage />} />
+            <Route path="/cinemas" element={<CinemaListPage />} />
+            <Route path="/cinema/:id" element={<CinemaDetailPage />} />
+            <Route path="/showtimes" element={<ShowtimeListPage />} />
 
-            {/* Profile & History */}
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/my-bookings" element={<MyBookingsPage />} />
+            {/* Private Routes (Vừa yêu cầu đăng nhập, vừa có Navbar/Footer) */}
+            <Route element={<ProtectedRoute />}>
+              {/* Booking flow */}
+              <Route path="/checkout/:showtimeId" element={<CheckoutPage />} />
+              <Route path="/payment/:bookingId" element={<PaymentPage />} />
+              <Route path="/ticket/:bookingId" element={<TicketPage />} />
+
+              {/* Profile & History */}
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/my-bookings" element={<MyBookingsPage />} />
+            </Route>
           </Route>
-
           {/* 404 */}
           <Route
             path="*"
             element={
-              <div className="p-10 text-center">Trang không tồn tại</div>
+              <div className="p-10 text-center min-h-[50vh] flex items-center justify-center">
+                Trang không tồn tại
+              </div>
             }
           />
         </Routes>

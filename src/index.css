@@ -66,4 +66,19 @@
     @apply bg-[#1F1F1F] border border-white/10 rounded-full px-4 py-1 text-sm
            focus:outline-none focus:border-primary/50 transition-all;
   }
+
+  /* Tối ưu Swiper Fade để tránh lồng text */
+  .swiper-slide {
+    opacity: 0 !important;
+    transition-property: opacity;
+  }
+
+  .swiper-slide-active {
+    opacity: 1 !important;
+  }
+
+  /* Đảm bảo nội dung chỉ chạy animation khi slide đó đang active */
+  .swiper-slide-active .animate-in {
+    animation-delay: 300ms; /* Đợi hình nền mờ đi một chút rồi mới hiện chữ */
+  }
 }

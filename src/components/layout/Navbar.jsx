@@ -108,9 +108,9 @@ const Navbar = () => {
               className="group flex items-center gap-3 outline-none"
             >
               <div className="w-9 h-9 rounded-full border-2 border-primary flex items-center justify-center overflow-hidden hover:shadow-primary-glow transition-all">
-                {user.avatar ? (
+                {user.avatarUrl ? (
                   <img
-                    src={user.avatar}
+                    src={user.avatarUrl}
                     alt="avatar"
                     className="w-full h-full object-cover"
                   />

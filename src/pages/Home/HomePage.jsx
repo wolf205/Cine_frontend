@@ -1,14 +1,12 @@
-import Footer from "../../components/layout/Footer";
-import Navbar from "../../components/layout/Navbar";
+import Hero from "../../components/home/Hero";
 
 const HomePage = () => {
   return (
     <div>
-      <Navbar />
+      <Hero />
       <div className="min-h-screen flex items-center justify-center p-4">
         HomePage
       </div>
-      <Footer />
     </div>
   );
 };

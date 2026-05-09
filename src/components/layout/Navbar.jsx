@@ -42,8 +42,8 @@ const Navbar = () => {
   };
 
   const movieItems = [
-    { label: "Phim Đang Chiếu", path: "/movies/now-showing" },
-    { label: "Phim Sắp Chiếu", path: "/movies/coming-soon" },
+    { label: "Phim Đang Chiếu", path: "/movies/now_showing" },
+    { label: "Phim Sắp Chiếu", path: "/movies/coming_soon" },
   ];
 
   const cinemaItems = [

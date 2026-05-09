@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import LoadingSpinner from "../../components/ui/LoadingSpinner";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -135,7 +136,14 @@ const RegisterPage = () => {
 
           {/* Register Button */}
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "ĐANG ĐĂNG KÝ..." : "ĐĂNG KÝ"}
+            {isSubmitting ? (
+              <div className="flex items-center justify-center gap-2">
+                <LoadingSpinner size="sm" />
+                <span>ĐANG ĐĂNG KÝ...</span>
+              </div>
+            ) : (
+              "ĐĂNG KÝ"
+            )}
           </Button>
         </form>
 

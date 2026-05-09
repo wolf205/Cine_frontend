@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import useAuthStore from "../../hooks/useAuth";
+import LoadingSpinner from "../../components/ui/LoadingSpinner";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -122,7 +123,14 @@ const LoginPage = () => {
 
           {/* Login Button */}
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "ĐANG ĐĂNG NHẬP..." : "ĐĂNG NHẬP"}
+            {isSubmitting ? (
+              <div className="flex items-center justify-center gap-2">
+                <LoadingSpinner size="sm" color="text-white" />
+                <span>ĐANG ĐĂNG NHẬP...</span>
+              </div>
+            ) : (
+              "ĐĂNG NHẬP"
+            )}
           </Button>
         </form>
 

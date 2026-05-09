@@ -2,17 +2,20 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ui/ProtectedRoute";
 import { Toaster } from "sonner";
 
-// Import Pages
-import HomePage from "./pages/Home/HomePage";
-import LoginPage from "./pages/Auth/LoginPage";
-import RegisterPage from "./pages/Auth/RegisterPage";
-import MovieDetailPage from "./pages/Movie/MovieDetailPage";
-import SeatMapPage from "./pages/Movie/SeatMapPage";
-import PaymentPage from "./pages/Payment/PaymentPage";
-import PaymentResultPage from "./pages/Payment/PaymentResultPage";
-import ProfilePage from "./pages/Profile/ProfilePage";
-import BookingHistoryPage from "./pages/Booking/BookingHistoryPage";
-import BookingDetailPage from "./pages/Booking/BookingDetailPage";
+// Pages
+import HomePage from "./pages/home/HomePage";
+import MovieListPage from "./pages/movie/MovieListPage";
+import MovieDetailPage from "./pages/movie/MovieDetailPage";
+import CinemaListPage from "./pages/cinema/CinemaListPage";
+import CinemaDetailPage from "./pages/cinema/CinemaDetailPage";
+import LoginPage from "./pages/auth/LoginPage";
+import RegisterPage from "./pages/auth/RegisterPage";
+import ProfilePage from "./pages/profile/ProfilePage";
+import MyBookingsPage from "./pages/profile/MyBookingsPage";
+import CheckoutPage from "./pages/booking/CheckoutPage";
+import PaymentPage from "./pages/payment/PaymentPage";
+import TicketPage from "./pages/payment/TicketPage";
+import ShowtimeListPage from "./pages/showtime/ShowtimeListPage";
 
 function App() {
   return (
@@ -22,22 +25,33 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
+          <Route path="/movies" element={<MovieListPage />} />
+          <Route path="/movie/:id" element={<MovieDetailPage />} />
+          <Route path="/cinemas" element={<CinemaListPage />} />
+          <Route path="/cinema/:id" element={<CinemaDetailPage />} />
+          <Route path="/showtimes" element={<ShowtimeListPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/movie/:id" element={<MovieDetailPage />} />
 
-          {/* Private Routes (Yêu cầu đăng nhập) */}
+          {/* Private Routes */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/booking/:showtimeId" element={<SeatMapPage />} />
-            <Route path="/payment" element={<PaymentPage />} />
-            <Route path="/payment/result" element={<PaymentResultPage />} />
+            {/* Booking flow */}
+            <Route path="/checkout/:showtimeId" element={<CheckoutPage />} />
+            <Route path="/payment/:bookingId" element={<PaymentPage />} />
+            <Route path="/ticket/:bookingId" element={<TicketPage />} />
+
+            {/* Profile & History */}
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/booking-history" element={<BookingHistoryPage />} />
-            <Route path="/booking/:id" element={<BookingDetailPage />} />
+            <Route path="/my-bookings" element={<MyBookingsPage />} />
           </Route>
 
-          {/* 404 Route - Optional */}
-          <Route path="*" element={<div>Page Not Found</div>} />
+          {/* 404 */}
+          <Route
+            path="*"
+            element={
+              <div className="p-10 text-center">Trang không tồn tại</div>
+            }
+          />
         </Routes>
       </Router>
     </>
